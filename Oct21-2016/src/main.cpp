@@ -13,7 +13,7 @@ int main(int argc, char *argv)
   dogeSprite.setScale(0.25f, 0.25f);*/
 
   sf::Image dogeImage;
-  dogeImage.loadFromFile("res/doge.jpg");
+  dogeImage.loadFromFile("res/stevegibson.jpg");
 
   // Tell OpenGL that we want to use 2D textures. 
   glEnable(GL_TEXTURE_2D);
@@ -22,6 +22,16 @@ int main(int argc, char *argv)
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
 
+
+  /* Tell OpenGL that we want to test the depth of each vertex to make sure that things that
+   * are closer appear closer. */
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDepthFunc(GL_LESS);
+  
+  glEnable(GL_CULL_FACE);
+
+  glFrontFace(GL_CW);
   // Generate a texture in OpenGL, and retrieve its ID so that we can access it.
   GLuint dogeTextureID;
   glGenTextures(1, &dogeTextureID);
@@ -51,6 +61,7 @@ int main(int argc, char *argv)
   glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   float positionZ = 0.5f;
+  float angle = 0.0f;
 
   sf::Event evt;
   sf::Clock appTimer;
@@ -63,71 +74,139 @@ int main(int argc, char *argv)
       }
     }
 
-    //dogeSprite.move(20.0f * deltaTime, 0.0f); // glTranslate
-    //dogeSprite.rotate(20.0f); // glRotate
-    //dogeSprite.scale(0.25, 0.25f); // glScale
-
-    // do stuff.
-    //window.clear();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //positionZ += 0.1 * deltaTime;
-    GLfloat position[] = { 0.0f, 0.0f, positionZ, 0.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
 
     GLenum error = glGetError();
 
     float offset = 0.25f;
+    angle += 90.0f * deltaTime;
 
     //draw stuff
-    glRotatef(45.0f * deltaTime, 0.0f, 1.0f, 0.0f); // rotating 45 degrees on the z axis.
-
+    GLfloat position[] = { positionZ, -0.1, positionZ, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    
     glPushMatrix();
-    //glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // rotating 45 degrees on the z axis.
+      glRotatef(angle, 1.0f, 0.0f, 0.0f); // rotate at 90 degrees/second on the X axis. 
+      glRotatef(20.0f, 0.0f, 1.0f, 0.0f); //rotate 20 degrees on the Y axis
 
-    // Begin our drawing block.
-    glBegin(GL_QUADS);
+      // Begin our drawing block.
+      glBegin(GL_QUADS);
 
-    // Draw a vertex at (0.0f, 0.0f, 0.0f).
-    /*glColor3f(1.0f, 1.0f, 1.0f);
-    glTexCoord2f()
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(-offset, -offset, 0.0f);
-    
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(-offset, offset, 0.0f);
-    
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(offset, offset, 0.0f);
-    
-    glColor3f(0.0f, 1.0f, 1.0f);
-    glVertex3f(offset, -offset, 0.0f);*/
+        float leftS = 0.3f;
+        float rightS = 0.7f;
+        float topT = 0.25f;
+        float bottomT = 0.75f;
 
-    //glColor3f(1.0f, 0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.0f);
-    //glNormal3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(-offset, -offset, offset);
+        // Front
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(-offset, -offset, offset);
 
-    //glColor3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, 1.0f);
-    //glNormal3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(-offset, offset, offset);
+        glTexCoord2f(leftS, topT);
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(-offset, offset, offset);
 
-    //glColor3f(0.0f, 0.0f, 1.0f);
-    glTexCoord2f(1.0f, 1.0f);
-    //glNormal3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(offset, offset, offset);
+        glTexCoord2f(rightS, topT);
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(offset, offset, offset);
 
-    //glColor3f(0.0f, 1.0f, 1.0f);
-    glTexCoord2f(1.0f, 0.0f);
-    //glNormal3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(offset, -offset, offset);
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(offset, -offset, offset);
 
-    // End our drawing block.
-    glEnd();
+        // Right
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(offset, -offset, offset);
+
+        glTexCoord2f(leftS, topT);
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(offset, offset, offset);
+
+        glTexCoord2f(rightS, topT);
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(offset, offset, -offset);
+
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(offset, -offset, -offset);
+
+        // Left
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glVertex3f(-offset, -offset, -offset);
+
+        glTexCoord2f(leftS, topT);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glVertex3f(-offset, offset, -offset);
+
+        glTexCoord2f(rightS, topT);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glVertex3f(-offset, offset, offset);
+
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
+        glVertex3f(-offset, -offset, offset);
+
+        // Back
+        glColor3f(0.0f, 1.0f, 1.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f(offset, -offset, -offset);
+
+        glTexCoord2f(leftS, topT);
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f(offset, offset, -offset);
+
+        glTexCoord2f(rightS, topT);
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f(-offset, offset, -offset);
+
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f(-offset, -offset, -offset);
+
+        // Top
+        glColor3f(1.0f, 0.0f, 1.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(-offset, offset, offset);
+
+        glTexCoord2f(leftS, topT);
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(-offset, offset, -offset);
+
+        glTexCoord2f(rightS, topT);
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(offset, offset, -offset);
+
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(offset, offset, offset);
+
+        // Bottom
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(leftS, bottomT);
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(-offset, -offset, -offset);
+
+        glTexCoord2f(leftS, topT);
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(-offset, -offset, offset);
+
+        glTexCoord2f(rightS, topT);
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(offset, -offset, offset);
+
+        glTexCoord2f(rightS, bottomT);
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(offset, -offset, -offset);
+
+      // End our drawing block.
+      glEnd();
 
     glPopMatrix();
 
