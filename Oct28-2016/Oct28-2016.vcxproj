@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TransformNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="src\TransformNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
